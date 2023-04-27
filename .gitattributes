@@ -1,0 +1,77 @@
+###############################################################################
+# Set default behavior to automatically normalize line endings.
+###############################################################################
+* text=auto
+
+*.cs text diff=csharp 
+*.vb text
+*.resx text
+*.c text
+*.cpp text
+*.cxx text
+*.h text
+*.hxx text
+*.py text eol=lf
+*.rb text
+*.java text
+*.html text
+*.htm text
+*.css text
+*.scss text
+*.sass text
+*.less text
+*.js text
+*.lisp text
+*.clj text
+*.sql text
+*.php text
+*.lua text
+*.m text
+*.asm text
+*.erl text
+*.fs text
+*.fsx text
+*.hs text
+*.cmd text
+*.bat text
+*.sh text eol=lf
+*.yml text eol=lf
+*.json text
+*.conf text
+*.xaml text
+*.xml text
+*.m4 text
+*.i text
+
+.gitignore text
+.gitattributes text
+*.md text
+Dockerfile text
+
+*.xproj text
+*.csproj text
+*.vbproj text
+*.fsproj text
+*.dbproj text
+*.sln text eol=crlf
+
+*.postman_collection text
+
+*.doc   diff=astextplain
+*.DOC	diff=astextplain
+*.docx	diff=astextplain
+*.DOCX	diff=astextplain
+*.dot	diff=astextplain
+*.DOT	diff=astextplain
+*.pdf	diff=astextplain
+*.PDF	diff=astextplain
+*.rtf	diff=astextplain
+*.RTF	diff=astextplain
+
+*.jpg  	binary
+*.png 	binary
+*.gif 	binary
+
+# These UTF16 files need special treatment...
+OnePlanner.Resources/resource.h -text diff merge
+RestApis/Capture.RestApi/Capture.RestApi.Host/Scripts/_references.js -text diff merge
