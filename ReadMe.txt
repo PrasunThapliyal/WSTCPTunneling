@@ -71,3 +71,64 @@ Sequence diagram using https://www.websequencediagrams.com/
 	WSServer -> WSClient: Custom mesage instructing A to send to ETP
 	WSClient -> TCPProxyServer(A): Custom mesage instructing A to send to ETP
 	TCPProxyServer(A) -> ETP: Send to ETP
+
+==============================================================
+
+Well I got stuck at Step 3 of this
+	1. First lets not worry about WS or the dev server.
+	2. ETP and Postgres running locally.
+	3. Write A and B in the same application. Let ETP talk via A -> B to Postgres.
+	
+Both sides connected succesfully (as in TCP connect), but as soon as bytes began to flow, the client raised an exception stating that there's a possible Man-in-the-middle attack.
+This was due to lack of SSL in my communication, and I haven't been able to figure out yet.
+
+However, a different wonderful thing was discovered as I was searching to solve the SSL exception.
+
+ref: This and a few other links have the same technique
+	https://stackoverflow.com/questions/15768913/relay-postgresql-connection-over-another-server
+	
+(****) Basically, if I can reach the Dev machine directly via SSH, I can setup what is known as ssh tunneling
+
+	CIENA+pthapliy@DESKTOP-V99LATL MINGW64 /C/GIT/hmaccsharp (PR_01)
+		$ ssh bpadmin@carbonundoredo.test.apps.ciena.com
+		bpadmin@carbonundoredo.test.apps.ciena.com's password:
+		Last login: Fri Apr 28 07:00:49 2023 from 10.124.6.203
+		[bpadmin@ip-10-78-133-253 ~]$ 
+
+	Further, on the Dev Server, note down that to reach the AWS RDS (Postgres), I have to call psql -h 10.78.133.10 -U bpadmin postgres
+	This is a private IP and can only be reached from within the Dev server.
+	Note down the IP/Username/Password of the postgres running on Dev (actually not running on dev -- this one is RDS, but reachable through Dev)
+	
+	Next, pick a random new port number that your could-have-been proxy would have supplied. And run this command on the bash terminal in your local laptop
+	I chose port 7654
+	
+	CIENA+pthapliy@DESKTOP-V99LATL MINGW64 /C/GIT/hmaccsharp (PR_01)
+		$ ssh bpadmin@carbonundoredo.test.apps.ciena.com -CNL localhost:7654:10.78.133.10:5432
+		bpadmin@carbonundoredo.test.apps.ciena.com's password:
+
+	After you enter the password, the command hangs .. let it be .. don't close the window
+	
+	What we're saying here is that a postgres client when pointed to locahost:7654 will actually connect to Dev->10.78.133.10:5432
+	That's it ..
+	
+	Open a new CMD window
+	
+	C:\Users\pthapliy>cd "C:\Program Files\PostgreSQL\14\bin"
+	
+	C:\Program Files\PostgreSQL\14\bin>psql.exe -h localhost -p 7654 -U bpadmin postgres
+		Password for user bpadmin:
+		psql (14.5, server 11.17)
+		WARNING: Console code page (437) differs from Windows code page (1252)
+				 8-bit characters might not work correctly. See psql reference
+				 page "Notes for Windows users" for details.
+		SSL connection (protocol: TLSv1.2, cipher: AES128-SHA256, bits: 128, compression: off)
+		Type "help" for help.
+
+		postgres=> \c topologyplanner
+		
+	And just like that, we've connected to the RDS on Dev machine.
+	
+
+
+
+
